@@ -50,12 +50,13 @@ module Fae
         conditions[:user_id] = params['user'] if params['user'].present?
         conditions[:changeable_type] = params['model'] if params['model'].present?
         conditions[:change_type] = params['type'] if params['type'].present?
+        params['date'] ||= ''
 
-        date_scope = case params['date']
-          when URI.escape('Last Hour') then   ['fae_changes.updated_at >= ?', 60.minutes.ago]
-          when URI.escape('Last Day' ) then   ['fae_changes.updated_at >= ?', 1.day.ago]
-          when URI.escape('Last Week') then   ['fae_changes.updated_at >= ?', 1.week.ago]
-          when URI.escape('Last Month') then  ['fae_changes.updated_at >= ?', 1.month.ago]
+        date_scope = case params['date'].downcase.gsub('%20', '-')
+          when 'last-hour' then   ['fae_changes.updated_at >= ?', 60.minutes.ago]
+          when 'last-day' then    ['fae_changes.updated_at >= ?', 1.day.ago]
+          when 'last-week' then   ['fae_changes.updated_at >= ?', 1.week.ago]
+          when 'last-month' then  ['fae_changes.updated_at >= ?', 1.month.ago]
         end
 
         # use good 'ol MySQL to search if search param is present
